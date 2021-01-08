@@ -1,7 +1,8 @@
 mod network_layer;
-
-//use log::{warn};
+use log::{warn,error};
 use std;
+use std::panic::resume_unwind;
+
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -17,16 +18,26 @@ fn main() {
 ///
 /// Requirements: Port, buff size.
 pub fn sanitize_args(args: &Vec<String>) -> (i32, i32) {
-    let mut res = vec![];
+    if args.len() > network_layer::MAX_ARGS as usize{
+        error!("Args: {}, MAX: {}", args.len(), network_layer::MAX_ARGS);
+        panic!("Too many arguments provided.")
+    }
+
+    let mut res: Vec<i32> = vec![];
+
 
     for i in 1..args.len() {
         let split: Vec<&str> = args[i].split("=").collect();
 
-        let result = split[1]
+        let mut result = match split[1]
             .trim()
-            .parse()
-            .expect("Failed to parse argument. Not an integer.");
-
+            .parse() {
+            Ok(result) => result,
+            Err(_) => {
+                warn!("Parsing failed. Using default {}", network_layer::DEFAULTS[i]);
+                1
+            }
+        };
         res.insert(res.len(), result);
     }
     println!("{} {}", res[0], res[1]);
