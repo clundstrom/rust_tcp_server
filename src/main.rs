@@ -4,6 +4,9 @@ use log::{warn, error};
 use std;
 use std::collections::HashMap;
 use std::collections::hash_map::RandomState;
+use std::io::Error;
+use std::net::TcpListener;
+use crate::network_layer::AbstractNetworkLayer;
 
 fn main() {
     env_logger::init();
@@ -15,9 +18,19 @@ fn main() {
     let args: HashMap<&str, i32, RandomState> = sanitize_args(&args);
 
     // Insert argument values here
-    let network = network_layer::AbstractNetworkLayer::new(args["bufsize"], args["early_terminate"] as u8, args["port"] as u16, args["transfer_rate"]);
+    let network: AbstractNetworkLayer = network_layer::AbstractNetworkLayer::new(
+        args["bufsize"],
+        args["early_terminate"] as u8,
+        args["port"] as u16,
+        args["transfer_rate"]);
 
-    network.schedule_task("Test")
+    let listener: TcpListener = network.accept_connections();
+
+    loop {
+        for stream in listener.incoming() {
+            // do stuff
+        }
+    }
 }
 
 /// Sanitizes application arguments to meet requirements
@@ -48,7 +61,6 @@ pub fn sanitize_args(args: &Vec<String>) -> HashMap<&str, i32, RandomState> {
     }
 
     // Verify keys
-
     let keys = vec![&"bufsize", &"early_terminate", &"port", &"transfer_rate"];
     let mut mapped = vec![];
 

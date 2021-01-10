@@ -1,3 +1,5 @@
+use std::net::TcpListener;
+
 // Rate,buf,port,early_term
 pub const MAX_ARGS: i32 = 5;
 pub const DEFAULTS: [i32; 4] = [100, 64, 8000, 0];
@@ -21,5 +23,16 @@ impl AbstractNetworkLayer {
     ///
     pub fn schedule_task(&self, message: &str) -> () {
         println!("{}", &message);
+    }
+
+    pub fn accept_connections(&self) -> TcpListener {
+        let addr = format!("127.0.0.1:{}", self.port);
+        let listener = match TcpListener::bind(&addr) {
+            Ok(res) => { res }
+            Err(_) => { panic!("Could bind to {}", addr) }
+        };
+        log::info!("Listening on {addr}", addr = addr);
+
+        listener
     }
 }
