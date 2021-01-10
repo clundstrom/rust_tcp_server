@@ -3,17 +3,17 @@ pub const MAX_ARGS: i32 = 5;
 pub const DEFAULTS: [i32; 4] = [100, 64, 8000, 0];
 
 pub struct AbstractNetworkLayer {
-    transfer_rate: i32,
     bufsize: i32,
-    port: u16,
-    // 0-65535
     early_terminate: u8,
+    port: u16,
+    transfer_rate: i32,
+    // 0-65535
 }
 
 impl AbstractNetworkLayer {
     // Pseudo-constructor
-    pub fn new(transfer_rate: i32, bufsize: i32, port: u16, early_terminate: u8) -> AbstractNetworkLayer {
-        AbstractNetworkLayer { transfer_rate, bufsize, port, early_terminate }
+    pub fn new(bufsize: i32, early_terminate: u8, port: u16, transfer_rate: i32) -> AbstractNetworkLayer {
+        AbstractNetworkLayer { bufsize, early_terminate, port, transfer_rate }
     }
 
     ///
