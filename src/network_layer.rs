@@ -1,8 +1,6 @@
-use log::{warn};
-
 // Rate,buf,port,early_term
-pub const DEFAULTS: [i32; 4] = [1, 100, 8000, 0];
-pub const MAX_ARGS: i32 = 3;
+pub const MAX_ARGS: i32 = 5;
+pub const DEFAULTS: [i32; 4] = [100, 64, 8000, 0];
 
 pub struct AbstractNetworkLayer {
     transfer_rate: i32,
@@ -11,8 +9,6 @@ pub struct AbstractNetworkLayer {
     // 0-65535
     early_terminate: u8,
 }
-
-trait NetworkLayer {}
 
 impl AbstractNetworkLayer {
     // Pseudo-constructor
