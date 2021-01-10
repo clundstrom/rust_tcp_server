@@ -1,11 +1,12 @@
 mod network_layer;
-use log::{warn, error};
+
+use log::{warn, info, error};
 use std;
 use std::collections::HashMap;
 use std::collections::hash_map::RandomState;
 use std::net::TcpListener;
 use network_layer::AbstractNetworkLayer;
-use std::io::{Read};
+use std::thread;
 
 fn main() {
     env_logger::init();
@@ -25,19 +26,22 @@ fn main() {
     };
 
     let listener: TcpListener = network.accept_connections();
-
-    loop {
-        for stream in listener.incoming() {
-
-            let mut stream = stream.unwrap();
-            println!("Accepted connection from {:?}", stream.peer_addr());
-
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                info!("Accepted connection from {:?}", stream.peer_addr());
+                thread::spawn(move || {
+                    network.clone().echo(stream);
+                });
+            }
+            Err(e) => {
+                error!("Connection failed. {}", e);
+            }
         }
     }
 }
 
 /// Sanitizes application arguments to meet requirements
-///
 /// Requirements: buff size, early_termination, port, transfer_rate
 pub fn sanitize_args(args: &Vec<String>) -> HashMap<&str, i32, RandomState> {
     if args.len() > network_layer::MAX_ARGS as usize {
