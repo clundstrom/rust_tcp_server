@@ -1,12 +1,11 @@
 mod network_layer;
-
 use log::{warn, error};
 use std;
 use std::collections::HashMap;
 use std::collections::hash_map::RandomState;
-use std::io::Error;
 use std::net::TcpListener;
-use crate::network_layer::AbstractNetworkLayer;
+use network_layer::AbstractNetworkLayer;
+use std::io::{Read};
 
 fn main() {
     env_logger::init();
@@ -18,17 +17,21 @@ fn main() {
     let args: HashMap<&str, i32, RandomState> = sanitize_args(&args);
 
     // Insert argument values here
-    let network: AbstractNetworkLayer = network_layer::AbstractNetworkLayer::new(
-        args["bufsize"],
-        args["early_terminate"] as u8,
-        args["port"] as u16,
-        args["transfer_rate"]);
+    let network: AbstractNetworkLayer = network_layer::AbstractNetworkLayer {
+        bufsize: args["bufsize"],
+        early_terminate: args["early_terminate"] as u8,
+        port: args["port"] as u16,
+        transfer_rate: args["transfer_rate"],
+    };
 
     let listener: TcpListener = network.accept_connections();
 
     loop {
         for stream in listener.incoming() {
-            // do stuff
+
+            let mut stream = stream.unwrap();
+            println!("Accepted connection from {:?}", stream.peer_addr());
+
         }
     }
 }
